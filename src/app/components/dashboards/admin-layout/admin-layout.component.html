@@ -154,7 +154,7 @@
 
 <div class="admin-container">
   <!-- Sidebar Component -->
-  <app-admin-sidebar></app-admin-sidebar>
+  <app-admin-sidebar [class.open]="sidebarOpen"></app-admin-sidebar>
 
   <!-- Mobile Overlay -->
   <div class="mobile-overlay" [class.active]="sidebarOpen" (click)="closeSidebar()"></div>
@@ -202,12 +202,11 @@
     <!-- Main Content Wrapper -->
     <main class="content-wrapper">
       <div class="content-inner">
-        <router-outlet></router-outlet>
-
+        
         <!-- Default Dashboard Content -->
-        <div class="dashboard-overview" *ngIf="showDefaultContent">
+        <!-- <div class="dashboard-overview" *ngIf="showDefaultContent">
           <!-- Stats Cards -->
-          <div class="stats-grid">
+          <!-- <div class="stats-grid">
             <div class="stat-card" *ngFor="let stat of dashboardStats">
               <div class="stat-icon" [style.background]="stat.color">{{ stat.icon }}</div>
               <div class="stat-content">
@@ -216,10 +215,10 @@
                 <span class="stat-change" [class]="stat.changeType">{{ stat.change }}</span>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <!-- Recent Activity -->
-         <div class="activity-section" *ngIf="recentActivities.length > 0">
+         <!-- <div class="activity-section" *ngIf="recentActivities.length > 0">
   <div class="activity-card">
     <div class="card-header">
       <h3>Recent Activity</h3>
@@ -238,7 +237,12 @@
     </div>
   </div>
 </div>
-        </div>
+        </div>  -->
+
+          <div class="content-inner">
+        <router-outlet></router-outlet> <!-- ✅ Displays the correct content -->
+      </div>
+
       </div>
     </main>
   </div>

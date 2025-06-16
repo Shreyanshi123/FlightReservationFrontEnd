@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
-
+/* @import '~@fortawesome/fontawesome-free/css/all.min.css'; */
 :root {
   --primary-color: #3d5cb8;
   --primary-color-dark: #334c99;

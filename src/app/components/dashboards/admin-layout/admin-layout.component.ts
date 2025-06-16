@@ -314,6 +314,10 @@ export class AdminLayoutComponent implements OnInit {
   ngOnInit() {
     this.checkScreenSize();
     this.checkRouteForDefaultContent();
+     this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
+      this.sidebarOpen = false; // ✅ Close sidebar on navigation
+    });
+
 
     console.log("Dashboard Stats:", this.dashboardStats);
     console.log("Popular Destinations:", this.popularDestinations);
