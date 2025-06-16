@@ -131,7 +131,7 @@ ngx-charts-bar-vertical, ngx-charts-pie-chart {
 /* Dashboard Grid */
 .dashboard-grid {
   display: grid;
-  gap: 2rem;
+  gap: 1rem;
   grid-template-columns: 1fr;
 }
 

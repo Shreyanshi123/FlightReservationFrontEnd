@@ -107,7 +107,7 @@ export class PopularFlightsComponent implements OnInit {
   }
 
   // Chart options
-  view: [number, number] = [800, 400];
+  view: [number, number] = [250, 400];
   pieView: [number, number] = [400, 300];
   showXAxis = true;
   showYAxis = true;

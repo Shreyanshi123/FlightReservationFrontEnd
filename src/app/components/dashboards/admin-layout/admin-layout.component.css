@@ -68,7 +68,7 @@
  
 /* Header Styles */
 
-.admin-header {
+/* .admin-header {
 
   background: white;
 
@@ -92,9 +92,9 @@
 
   backdrop-filter: blur(10px);
 
-}
+} */
  
-.header-left {
+/* .header-left {
 
   display: flex;
 
@@ -102,7 +102,7 @@
 
   gap: 1.5rem;
 
-}
+} */
  
 .mobile-menu-btn {
 
@@ -918,11 +918,11 @@
 
   }
 
-  .admin-header {
+  /* .admin-header {
 
     padding: 1rem;
 
-  }
+  } */
 
   .search-input {
 
