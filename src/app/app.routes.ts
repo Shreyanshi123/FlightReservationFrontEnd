@@ -270,7 +270,7 @@ export const routes: Routes = [
       { path: 'home', component: HomeComponent }, // ✅ Public
       { path: 'search', component: SearchComponent }, // ✅ Public
       { path: 'userprofile', component: UserProfileComponent, canActivate: [authGuard] }, // ✅ User Only
-      { path: 'booking/:flightNumber', component: BookingComponent }, // ✅ User Only
+      { path: 'booking/:flightNumber', component: BookingComponent, canActivate: [authGuard] }, // ✅ User Only
       { path: 'about', component: AboutComponent }, // ✅ Public
       { path: 'contact', component: ContactComponent }, // ✅ Public
       { path: 'home/booking', component: BookingComponent, canActivate: [authGuard] }, // ✅ User Only
