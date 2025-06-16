@@ -138,6 +138,7 @@ export const routes: Routes = [
 {path:'dashboard/editFlight/:flightNumber',component:EditairlineComponent},
 {path:'dashboard/rescheduleFlight/:flightNumber',component:RescheduleFlightComponent},
  {path:'addFlight',component:AddFlightComponent},
+ {path:'chart',component:ReservationChartComponent},
  { path: 'dashboard/schedule', component: ScheduleComponent },
   {path:"dashboard/login",component:LoginComponent},
  {path:"dashboard/register",component:RegisterComponent},

@@ -8,7 +8,8 @@ export const authGuard: CanActivateFn = (route, state) => {
  const router = inject(Router);
 
 if(authService.getToken()!=undefined){
-  if(authService.dataFromToken()=="Admin"){
+  if(authService.getUserRole()=="Admin"){
+    router.navigateByUrl("/dashboard/admin-layout");
     console.log("url",state.url);
     return true;
   }

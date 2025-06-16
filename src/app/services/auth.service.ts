@@ -372,6 +372,7 @@ export class AuthService {
    * @returns string
    */
   getUserRole(): string {
+    console.log(this.dataFromToken);
     return this.dataFromToken();
   }
  

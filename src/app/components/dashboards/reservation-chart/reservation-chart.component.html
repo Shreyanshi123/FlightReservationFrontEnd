@@ -19,7 +19,7 @@
 </div> -->
 
 
-<div *ngFor="let flightChart of flightCharts" class="chart-container">
+<!-- <div *ngFor="let flightChart of flightCharts" class="chart-container">
   <h3>{{ flightChart.flightNumber }}</h3>
   <canvas baseChart
     [datasets]="flightChart.chartData.datasets"
@@ -27,4 +27,111 @@
     [options]="barChartOptions"
     [type]="barChartType">
   </canvas>
+</div> -->
+
+
+<div class="reservation-dashboard">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1 class="dashboard-title">
+        <span class="title-icon">📊</span>
+        Flight Reservations Analytics
+      </h1>
+      <p class="dashboard-subtitle">Real-time booking status overview across all flights</p>
+    </div>
+    
+    <!-- Status Legend -->
+    <div class="status-legend">
+      <div class="legend-title">Status Overview</div>
+      <div class="legend-items">
+        <div class="legend-item" *ngFor="let status of statusInfo">
+          <div class="legend-color" [style.background-color]="status.color"></div>
+          <span class="legend-icon">{{ status.icon }}</span>
+          <span class="legend-label">{{ status.label }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Loading reservation data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="hasError && !isLoading">
+    <div class="error-icon">⚠️</div>
+    <h3 class="error-title">Unable to Load Data</h3>
+    <p class="error-message">{{ errorMessage }}</p>
+    <button class="retry-button" (click)="retryLoad()">
+      <span class="retry-icon">🔄</span>
+      Try Again
+    </button>
+  </div>
+
+  <!-- Charts Grid -->
+  <div class="charts-grid" *ngIf="!isLoading && !hasError && flightCharts.length > 0">
+    <div class="chart-card" *ngFor="let flight of flightCharts; trackBy: trackByFlightNumber">
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="flight-info">
+          <h3 class="flight-number">
+            <span class="flight-icon">✈️</span>
+            {{ flight.flightNumber }}
+          </h3>
+          <div class="total-reservations">
+            <span class="total-label">Total</span>
+            <span class="total-count">{{ getTotalReservations(flight.chartData) }}</span>
+          </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+          <div class="stat-item" *ngFor="let data of flight.chartData.datasets[0].data; let i = index">
+            <div class="stat-dot" [ngStyle]="{'background-color': flight.chartData.datasets[0].backgroundColor?.[i]}"></div>
+            <span class="stat-value">{{ data }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart Container -->
+      <div class="chart-container">
+        <canvas
+          baseChart
+          class="chart-canvas"
+          [data]="flight.chartData"
+          [options]="barChartOptions"
+          [type]="barChartType">
+        </canvas>
+      </div>
+
+      <!-- Card Footer with Additional Info -->
+      <div class="card-footer">
+        <div class="status-breakdown">
+          <div class="breakdown-item" *ngFor="let label of flight.chartData.labels; let i = index">
+            <span class="breakdown-label">{{ label }}</span>
+            <span class="breakdown-value">{{ flight.chartData.datasets[0].data[i] }}</span>
+            <div class="breakdown-bar">
+              <div class="breakdown-progress" 
+                   [ngStyle]="{
+                     'width.%': (flight.chartData.datasets[0].data[i] as number) / getTotalReservations(flight.chartData) * 100,
+                     'background-color': flight.chartData.datasets[0].backgroundColor?.[i]
+                   }">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && !hasError && flightCharts.length === 0">
+    <div class="empty-icon">📭</div>
+    <h3 class="empty-title">No Reservation Data</h3>
+    <p class="empty-message">No flight reservations found. Check back later or contact support if this seems incorrect.</p>
+  </div>
 </div>
+
