@@ -137,16 +137,17 @@ export class LoginComponent {
 
       this.authService.signIn(myFormData).subscribe({
   next: (data: any) => {
+    console.log(data.user);
     Swal.fire({
       icon: "success",
       title: "Login Successful",
-      text: `Welcome, ${data.role === "Admin" ? "Admin" : "User"}!`,
+      text: `Welcome, ${data.user.role === 1 ? "Admin" : "User"}!`,
       timer: 2000,
       showConfirmButton: false,
     });
     localStorage.setItem("token", data.token);
     this.isLoading = false;
-    this.router.navigateByUrl(data.role === "Admin" ? "/dashboard" : "/");
+    this.router.navigateByUrl(data.user.role === 1 ? "/dashboard" : "");
   },
   error: (err: any) => {
     Swal.fire({

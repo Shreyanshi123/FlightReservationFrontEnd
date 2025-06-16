@@ -174,13 +174,13 @@ export class AuthService {
    */
   signIn(user: any): Observable<any> {
     this.userData = user;
-    console.log("new yash",this.userData)
+    console.log("chingu got signed in ",this.userData)
     const headers = this.createPublicHeaders();
  
     return this.http.post(`${this.API_URL}/Auth/login`, user, { headers }).pipe(
       tap((response: any) => {
         this.userData = response;
-        console.log("hello ysah",this.userData)
+        console.log("chingu signed in data",this.userData)
  
         // Store token and user data
         if (response.token) {
@@ -349,31 +349,36 @@ export class AuthService {
    * Decode token and extract user role
    * @returns string
    */
-  dataFromToken(): string {
-    const token = this.getToken();
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token) as Record<string, string>;
-        const userRole =
-          decodedToken[
-            'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-          ];
-        return userRole || '';
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        return '';
-      }
-    }
+ dataFromToken(): string {
+  const token = this.getToken();
+  if (!token) return '';
+
+  try {
+    const decodedToken = jwtDecode(token) as Record<string, any>;
+    console.log("Decoded Token:", decodedToken); // ✅ Debugging log
+
+    // Check different possible role claim formats
+    return (
+      decodedToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+      decodedToken['role'] || // Some APIs use 'role' directly
+      decodedToken['userRole'] || // Alternative naming
+      ''
+    );
+  } catch (error) {
+    console.error("Error decoding token:", error);
     return '';
   }
+}
  
   /**
    * Get user role from token
    * @returns string
    */
   getUserRole(): string {
-    console.log(this.dataFromToken);
-    return this.dataFromToken();
+     const role = this.dataFromToken();
+  console.log("User Role:", role); // ✅ Debugging log
+  return role;
+
   }
  
   /**

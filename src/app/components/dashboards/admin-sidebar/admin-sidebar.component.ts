@@ -1,30 +1,7 @@
-// import { CommonModule } from '@angular/common';
-// import { Component } from '@angular/core';
-// import { RouterLink } from '@angular/router';
-
-// @Component({
-//   selector: 'app-admin-sidebar',
-//   imports: [CommonModule,RouterLink],
-//   templateUrl: './admin-sidebar.component.html',
-//   styleUrl: './admin-sidebar.component.css'
-// })
-// export class AdminSidebarComponent {
-//   menuItems = [
-//     { name: 'Admin Dashboard', route: '/dashboard', icon: '🏠' },
-//     { name: 'Users Management', route: '/dashboard/users', icon: '👥' },
-//     { name: 'User Analytics', route: '/dashboard/user-analytics', icon: '💡' },
-//     {name:'User Reservations', route:'/dashboard/userswithreservations',icon: '💡'},
-//       { name: 'Schedule Flights', route: '/dashboard/dashboard/schedule', icon: '🕒' },
-//     { name: ' Booking Analytics', route: '/dashboard/admin-analytics', icon: '📊' },
-//     { name: 'Popular Flights Analytics', route: '/dashboard/popularFlights', icon: '✈️' },
-  
-    
-//   ];
-// }
-
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, HostListener } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
  
 @Component({
   selector: 'app-admin-sidebar',
@@ -47,9 +24,14 @@ menuItems = [
  
   isMobile = false;
   sidebarOpen = false;
+   adminName: string = 'Admin'; // Default name
+
+  constructor(private authService: AuthService, private router: Router) {}
+
  
   ngOnInit() {
     this.checkScreenSize();
+    this.adminName = this.authService.getUserName(); // ✅ Fetch admin name
   }
  
   @HostListener('window:resize', ['$event'])
@@ -64,6 +46,11 @@ menuItems = [
     }
   }
  
+  logout() {
+    this.authService.signOut(); // ✅ Clear authentication data
+    this.router.navigate(['dashboard/login']); // ✅ Redirect to login page
+  }
+
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen;
   }
