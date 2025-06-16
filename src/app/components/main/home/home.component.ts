@@ -5,6 +5,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FlightsService } from '../../../services/flights.service';
 import Swal from 'sweetalert2';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
+import { RecommendationService } from '../../../services/recommendation.service';
+import { AuthService } from '../../../services/auth.service';
 
 // Interfaces
 interface Particle {
@@ -45,6 +47,10 @@ interface Flight {
 export class HomeComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private flightService = inject(FlightsService);
+  recommendedFlights: any[] = [];
+  userId: number | null = null;
+
+ 
 
   // Form Configuration
   searchForm: FormGroup = new FormGroup({
@@ -108,15 +114,32 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   ];
 
-  constructor(private router: Router, private datePipe: DatePipe) {
+  constructor(private router: Router, private datePipe: DatePipe,private recommendationService: RecommendationService, private authService: AuthService) {
     this.initializeComponent();
   }
 
   ngOnInit(): void {
+    this.userId = this.authService.getUserData().user.id; // ✅ Get user ID from AuthService
+    if (this.userId) {
+      this.fetchRecommendations();
+    }
+
     this.loadFlightData();
     this.setupFormListeners();
     this.generateParticles();
   }
+  fetchRecommendations() {
+    this.recommendationService.getUserRecommendations(this.userId!).subscribe({
+      next: (flights) => {
+        this.recommendedFlights = flights;
+        console.log("Recommended Flights:", this.recommendedFlights);
+      },
+      error: (error) => {
+        console.error("Error fetching recommendations:", error);
+      }
+    });
+  }
+
 
   ngOnDestroy(): void {
     this.destroy$.next();

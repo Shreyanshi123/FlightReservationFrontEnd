@@ -348,6 +348,21 @@
     </div>
   </section>
 
+<div class="recommended-flights" *ngIf="recommendedFlights.length > 0">
+  <h2 class="recommended-title">Recommended Flights for You</h2>
+  <div class="recommended-grid">
+    <div class="flight-card" *ngFor="let flight of recommendedFlights">
+      <div class="flight-info">
+        <h3 class="flight-name">{{ flight.airline }}</h3>
+        <p class="flight-route">{{ flight.origin }} → {{ flight.destination }}</p>
+        <p class="flight-price">Starting at ECONOMY ${{ flight.economyPrice }}</p>
+      </div>
+      <button class="book-btn">Book Now</button>
+    </div>
+  </div>
+</div>
+
+
   <!-- Features Section -->
   <section class="features-section">
     <div class="features-container" data-aos="fade-up">
@@ -370,7 +385,7 @@
   </section>
 
   <!-- Newsletter Section -->
-  <section class="newsletter-section">
+  <!-- <section class="newsletter-section">
     <div class="newsletter-container" data-aos="fade-up">
       <div class="newsletter-content">
         <h2 class="newsletter-title">Stay Updated</h2>
@@ -394,7 +409,7 @@
         </form>
       </div>
     </div>
-  </section>
+  </section> -->
 
   <!-- Footer -->
   <footer class="footer">
