@@ -147,7 +147,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BookingService } from '../../../services/booking.service';
-import { BaseChartDirective } from 'ng2-charts';
+import { BaseChartDirective,NgChartsConfiguration} from 'ng2-charts';
 import { Chart, registerables } from 'chart.js';
 import { CommonModule } from '@angular/common';
 
@@ -157,66 +157,435 @@ Chart.register(...registerables);
   selector: 'app-reservation-chart',
   standalone: true,
   imports: [BaseChartDirective, CommonModule],
-  templateUrl: './reservation-chart.component.html',
-  styleUrls: ['./reservation-chart.component.css'],
+  template: `
+    <div class="dashboard-container">
+      <div class="dashboard-header">
+        <h1 class="dashboard-title">
+          <span class="title-icon">✈️</span>
+          Flight Reservations Dashboard
+        </h1>
+        <div class="stats-overview">
+          <div class="stat-card">
+            <div class="stat-number">{{ getTotalFlights() }}</div>
+            <div class="stat-label">Active Flights</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">{{ getTotalReservations() }}</div>
+            <div class="stat-label">Total Reservations</div>
+          </div>
+        </div>
+      </div>
+
+      
+         
+          
+         
+
+      <div class="charts-grid" *ngIf="flightCharts.length > 0; else loadingState">
+  <div *ngFor="let flightChart of flightCharts; let i = index; trackBy: trackByFlightNumber" class="chart-card"
+       [style.animation-delay]="getAnimationDelay(i) + 'ms'">
+    
+    <!-- Chart Header -->
+    <div class="chart-header">
+      <div class="flight-info">
+        <h3 class="flight-number">{{ flightChart.flightNumber }}</h3>
+        
+        <!-- Flight Status Indicators -->
+        <div class="flight-status-indicators">
+          <div class="status-dot confirmed" [attr.data-count]="getStatusCount(flightChart, 0)"></div>
+          <div class="status-dot pending" [attr.data-count]="getStatusCount(flightChart, 1)"></div>
+          <div class="status-dot cancelled" [attr.data-count]="getStatusCount(flightChart, 2)"></div>
+          <div class="status-dot refunded" [attr.data-count]="getStatusCount(flightChart, 3)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart Container -->
+    <div class="chart-container">
+      <canvas baseChart
+              class="chart-canvas"
+              [data]="flightChart.chartData"
+              [options]="barChartOptions"
+              [type]="barChartType">
+      </canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+<ng-template #loadingState>
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Loading reservation data...</p>
+  </div>
+</ng-template>
+    </div>
+  `,
+  styles: [`
+    .dashboard-container {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 2rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .dashboard-header {
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .dashboard-title {
+      color: white;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .title-icon {
+      font-size: 2rem;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .stats-overview {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      color: white;
+      min-width: 150px;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(45deg, #ffd700, #fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .chart-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 
+        0 20px 40px rgba(0,0,0,0.1),
+        0 8px 32px rgba(0,0,0,0.05);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: slideInUp 0.6s ease-out both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chart-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 24px 24px 0 0;
+    }
+
+    .chart-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 
+        0 32px 60px rgba(0,0,0,0.15),
+        0 16px 48px rgba(0,0,0,0.1);
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #f0f2f7;
+    }
+
+    .flight-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .flight-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin: 0;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .flight-status-indicators {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .status-dot.confirmed { background: #27ae60; }
+    .status-dot.pending { background: #f39c11; }
+    .status-dot.cancelled { background: #e74c3c; }
+    .status-dot.refunded { background: #3498db; }
+
+    .status-dot:hover {
+      transform: scale(1.5);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .chart-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      background: rgba(102, 126, 234, 0.1);
+      border: none;
+      border-radius: 12px;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.2rem;
+    }
+
+    .action-btn:hover {
+      background: rgba(102, 126, 234, 0.2);
+      transform: scale(1.1);
+    }
+
+    .chart-wrapper {
+      height: 400px;
+      margin: 1.5rem 0;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(248, 249, 252, 0.8);
+      padding: 1rem;
+    }
+
+    .chart-summary {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 2px solid #f0f2f7;
+    }
+
+    .summary-stats {
+      display: flex;
+      justify-content: space-around;
+      gap: 1rem;
+    }
+
+    .summary-item {
+      text-align: center;
+      padding: 0.75rem;
+      background: rgba(102, 126, 234, 0.05);
+      border-radius: 12px;
+      flex: 1;
+      transition: all 0.3s ease;
+    }
+
+    .summary-item:hover {
+      background: rgba(102, 126, 234, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .summary-label {
+      display: block;
+      font-size: 0.8rem;
+      color: #7f8c8d;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .summary-value {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      color: white;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-container {
+        padding: 1rem;
+      }
+      
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .chart-card {
+        padding: 1.5rem;
+      }
+      
+      .dashboard-title {
+        font-size: 2rem;
+      }
+      
+      .stats-overview {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  `]
 })
 export class ReservationChartComponent implements OnInit {
   public flightCharts: { flightNumber: string; chartData: ChartData<'bar'> }[] = [];
-  public isLoading = true;
-  public hasError = false;
-  public errorMessage = '';
-
+  
   public barChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
+    animation: {
+      duration: 2000,
+      easing: 'easeInOutQuart'
+    },
     scales: {
       y: {
         beginAtZero: true,
         grid: {
-          color: 'rgba(255, 255, 255, 0.1)',
+          color: 'rgba(0,0,0,0.05)',
+          lineWidth: 1
         },
         ticks: {
           stepSize: 10,
-          color: '#94a3b8',
+          color: '#5a6c7d',
           font: { 
-            size: 12
+            size: 12, 
+            weight: 500 
           },
-        },
+          padding: 10
+        }
       },
       x: {
         grid: {
-          display: false,
+          display: false
         },
         ticks: {
-          color: '#64748b',
+          color: '#5a6c7d',
           font: { 
-            size: 12
+            size: 12, 
+            weight: 600
           },
-        },
-      },
+          padding: 10
+        }
+      }
     },
     plugins: {
       legend: {
-        display: false,
+        display: false
       },
       tooltip: {
-        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-        titleColor: '#f1f5f9',
-        bodyColor: '#cbd5e1',
-        cornerRadius: 8,
-        padding: 12,
-      },
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        titleColor: 'white',
+        bodyColor: 'white',
+        borderColor: 'rgba(255,255,255,0.2)',
+        borderWidth: 1,
+        cornerRadius: 12,
+        displayColors: true,
+        padding: 12
+      }
     },
+    elements: {
+      bar: {
+        borderRadius: 8,
+        borderSkipped: false
+      }
+    }
   };
 
   public barChartType: ChartType = 'bar';
-
-  public statusInfo = [
-    { label: 'Confirmed', color: '#10b981', icon: '✓' },
-    { label: 'Pending', color: '#f59e0b', icon: '⏳' },
-    { label: 'Cancelled', color: '#ef4444', icon: '✕' },
-    { label: 'Refunded', color: '#3b82f6', icon: '↩' },
-  ];
 
   constructor(private bookingService: BookingService) {}
 
@@ -225,65 +594,78 @@ export class ReservationChartComponent implements OnInit {
   }
 
   loadReservationData(): void {
-    this.isLoading = true;
-    this.hasError = false;
-    
-    this.bookingService.getReservationStatusSummary().subscribe({
-      next: (data: any) => {
-        this.flightCharts = data.map((flight: any) => ({
-          flightNumber: flight.flightNumber,
-          chartData: {
-            labels: ['Confirmed', 'Pending', 'Cancelled', 'Refunded'],
-            datasets: [
-              {
-                label: 'Reservations',
-                data: flight.statusCounts.map((s: any) => s.count),
-                backgroundColor: [
-                  'rgba(16, 185, 129, 0.8)',
-                  'rgba(245, 158, 11, 0.8)',
-                  'rgba(239, 68, 68, 0.8)',
-                  'rgba(59, 130, 246, 0.8)',
-                ],
-                borderColor: [
-                  '#10b981',
-                  '#f59e0b',
-                  '#ef4444',
-                  '#3b82f6',
-                ],
-                borderWidth: 2,
-                hoverBackgroundColor: [
-                  'rgba(16, 185, 129, 1)',
-                  'rgba(245, 158, 11, 1)',
-                  'rgba(239, 68, 68, 1)',
-                  'rgba(59, 130, 246, 1)',
-                ],
-              },
-            ],
-          },
-        }));
-        this.isLoading = false;
-      },
-      error: (error: any) => {
-        this.hasError = true;
-        this.errorMessage = 'Failed to load reservation data. Please try again.';
-        this.isLoading = false;
-        console.error('Error loading reservation data:', error);
-      }
+    this.bookingService.getReservationStatusSummary().subscribe((data) => {
+      this.flightCharts = data.map((flight) => ({
+        flightNumber: flight.flightNumber,
+        chartData: {
+          labels: ['Confirmed', 'Pending', 'Cancelled', 'Refunded'],
+          datasets: [
+            {
+              label: 'Reservations',
+              data: flight.statusCounts.map(
+                (s: { status: number; count: number }) => s.count
+              ),
+              backgroundColor: [
+                'rgba(39, 174, 96, 0.8)',   // Confirmed
+                'rgba(243, 156, 17, 0.8)',  // Pending
+                'rgba(231, 76, 60, 0.8)',   // Cancelled
+                'rgba(52, 152, 219, 0.8)'   // Refunded
+              ],
+              borderColor: [
+                '#27ae60',
+                '#f39c11', 
+                '#e74c3c',
+                '#3498db'
+              ],
+              borderWidth: 2,
+              hoverBackgroundColor: [
+                '#27ae60',
+                '#f39c11',
+                '#e74c3c', 
+                '#3498db'
+              ],
+              hoverBorderWidth: 3
+            }
+          ]
+        }
+      }));
     });
-  }
-
-  retryLoad(): void {
-    this.loadReservationData();
-  }
-
-  getTotalReservations(chartData: ChartData<'bar'>): number {
-    return chartData.datasets[0].data.reduce((sum: number, count) => sum + Number(count), 0);
   }
 
   trackByFlightNumber(index: number, item: any): string {
     return item.flightNumber;
   }
+
+  getAnimationDelay(index: number): number {
+    return index * 150;
+  }
+
+  getTotalFlights(): number {
+    return this.flightCharts.length;
+  }
+
+  getTotalReservations(): number {
+    return this.flightCharts.reduce((total, flight) => {
+      return total + flight.chartData.datasets[0].data.reduce((sum: number, count) => sum + (count as number), 0);
+    }, 0);
+  }
+
+  getStatusCount(flightChart: any, statusIndex: number): number {
+    return flightChart.chartData.datasets[0].data[statusIndex] as number;
+  }
+
+  getFlightTotal(flightChart: any): number {
+    return flightChart.chartData.datasets[0].data.reduce((sum: number, count:number) => sum + (count as number), 0);
+  }
+
+  getConfirmedRate(flightChart: any): number {
+    const total = this.getFlightTotal(flightChart);
+    const confirmed = this.getStatusCount(flightChart, 0);
+    return total > 0 ? Math.round((confirmed / total) * 100) : 0;
+  }
 }
+
+
 
 
 
