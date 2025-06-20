@@ -6,8 +6,10 @@ import {provideHttpClient } from '@angular/common/http';
 import { FlightStatusPipe } from './flight-status.pipe';
 import {RecaptchaModule} from 'ng-recaptcha';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideToastr } from 'ngx-toastr'; // ✅ Import Toastr provider
+
 
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideHttpClient(),FlightStatusPipe, importProvidersFrom(RecaptchaModule), provideAnimationsAsync()],
+  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideHttpClient(),FlightStatusPipe, importProvidersFrom(RecaptchaModule), provideAnimationsAsync(), provideToastr() ],
 };

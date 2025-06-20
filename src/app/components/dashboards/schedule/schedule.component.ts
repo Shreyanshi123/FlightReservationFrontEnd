@@ -244,7 +244,7 @@ export class ScheduleComponent implements OnInit {
  
   onEdit(flightId: any): void {
 
-    this.router.navigate(['dashboard/dashboard/editFlight', flightId]);
+    this.router.navigate(['dashboard/editFlight', flightId]);
 
   }
  
@@ -252,7 +252,7 @@ export class ScheduleComponent implements OnInit {
 
     console.log(flightId);
 
-    this.router.navigate(['dashboard/dashboard/rescheduleFlight', flightId]);
+    this.router.navigate(['dashboard/rescheduleFlight', flightId]);
 
   }
  

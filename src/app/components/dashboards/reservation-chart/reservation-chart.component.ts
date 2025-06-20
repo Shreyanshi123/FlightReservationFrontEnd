@@ -189,6 +189,7 @@ Chart.register(...registerables);
     <div class="chart-header">
       <div class="flight-info">
         <h3 class="flight-number">{{ flightChart.flightNumber }}</h3>
+          <h3 class="flight-number">{{ flightChart.origin }} - {{flightChart.destination}}</h3>
         
         <!-- Flight Status Indicators -->
         <div class="flight-status-indicators">
@@ -522,7 +523,7 @@ Chart.register(...registerables);
   `]
 })
 export class ReservationChartComponent implements OnInit {
-  public flightCharts: { flightNumber: string; chartData: ChartData<'bar'> }[] = [];
+  public flightCharts: { flightNumber: string; origin:string;destination:string;chartData: ChartData<'bar'> }[] = [];
   
   public barChartOptions: ChartConfiguration['options'] = {
     responsive: true,
@@ -597,6 +598,8 @@ export class ReservationChartComponent implements OnInit {
     this.bookingService.getReservationStatusSummary().subscribe((data) => {
       this.flightCharts = data.map((flight) => ({
         flightNumber: flight.flightNumber,
+        origin:flight.origin,
+        destination:flight.destination,
         chartData: {
           labels: ['Confirmed', 'Pending', 'Cancelled', 'Refunded'],
           datasets: [
